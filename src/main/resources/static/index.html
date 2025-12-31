@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线购物系统 - 登录</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 24px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        
+        .role-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .role-btn:hover {
+            border-color: #667eea;
+        }
+        
+        .role-btn.active {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            z-index: 10;
+            cursor: pointer;
+        }
+        
+        /* 禁用浏览器自带的密码显示/隐藏按钮 */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+            display: none;
+        }
+        
+        input[type="password"]::-webkit-contacts-auto-fill-button,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            visibility: hidden;
+            display: none !important;
+            pointer-events: none;
+            position: absolute;
+            right: 0;
+        }
+        
+        input[type="password"]::-webkit-clear-button {
+            display: none;
+        }
+        
+        input[type="password"] {
+            -webkit-text-security: disc !important;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #555;
+        }
+        
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        /* Toast提示框样式 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1><i class="fas fa-shopping-cart"></i> 在线购物系统</h1>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username"><i class="fas fa-user"></i> 用户名</label>
+                <div class="input-wrapper">
+                    <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="password"><i class="fas fa-lock"></i> 密码</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" placeholder="请输入密码" required>
+                    <i class="fas fa-eye-slash" id="togglePassword"></i>
+                </div>
+            </div>
+            <div class="input-group">
+                <label><i class="fas fa-user-tag"></i> 角色</label>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="role-btn" id="customerBtn" data-role="customer">
+                        <i class="fas fa-user"></i> 我是顾客
+                    </button>
+                    <button type="button" class="role-btn" id="sellerBtn" data-role="seller">
+                        <i class="fas fa-store"></i> 我是卖家
+                    </button>
+                </div>
+                <input type="hidden" id="role" name="role" required>
+            </div>
+            <button type="submit" class="login-btn">登录</button>
+            <div class="error-message" id="errorMessage"></div>
+        </form>
+        <div class="register-link">
+            还没有账号？<a href="register.html">立即注册</a>
+        </div>
+    </div>
+    
+    <script>
+        // Toast提示框函数
+        function showToast(message, type = 'error') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            // 显示toast
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // 1秒后自动关闭
+            setTimeout(() => {
+                toast.classList.remove('show');
+                // 动画结束后移除元素
+                setTimeout(() => toast.remove(), 300);
+            }, 1000);
+        }
+        
+        // 密码显示/隐藏功能
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+        
+        // 角色选择按钮功能
+        const roleBtn = document.querySelectorAll('.role-btn');
+        const roleInput = document.getElementById('role');
+        
+        roleBtn.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // 移除所有按钮的选中状态
+                roleBtn.forEach(b => b.classList.remove('active'));
+                // 添加当前按钮的选中状态
+                this.classList.add('active');
+                // 设置隐藏输入框的值
+                roleInput.value = this.dataset.role;
+            });
+        });
+        
+        // 登录表单提交
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            
+            if (!username || !password || !role) {
+                showToast('请填写所有必填字段');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        role: role
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.code === 200) {
+                    // 保存token和用户信息到localStorage
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('username', data.data.username);
+                    localStorage.setItem('role', role);
+                    
+                    // 根据角色跳转到不同页面
+                    if (role === 'customer') {
+                        window.location.href = 'customer.html';
+                    } else if (role === 'seller') {
+                        window.location.href = 'seller.html';
+                    }
+                } else {
+                    showToast(data.msg || '登录失败');
+                }
+            } catch (error) {
+                showToast('网络错误，请稍后重试');
+                console.error('登录错误:', error);
+            }
+        });
+    </script>
+</body>
+</html>
